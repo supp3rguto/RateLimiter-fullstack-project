@@ -1,0 +1,131 @@
+body {
+    font-family: system-ui, sans-serif;
+    background: #222;
+    color: #eee;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+}
+
+#root {
+    max-width: 800px;
+    width: 100%;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+.dashboard {
+    background: #333;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.api-key-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+}
+.api-key-input label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #aaa;
+    margin-bottom: 8px;
+}
+.api-key-input input {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    padding: 10px;
+    background: #222;
+    border: 1px solid #555;
+    color: #eee;
+    border-radius: 4px;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+button {
+    font-size: 1rem;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background: #6200ea;
+    color: white;
+    transition: background 0.2s;
+}
+button:hover {
+    background: #7f39fb;
+}
+button:disabled {
+    background: #555;
+    color: #aaa;
+    cursor: not-allowed;
+}
+button[style*="#d50000"]:hover {
+    background: #e53935;
+}
+
+.token-status {
+    margin-bottom: 1rem;
+}
+.token-status label {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+progress {
+    width: 100%;
+    height: 25px;
+    margin-top: 10px;
+    border-radius: 4px;
+    border: 1px solid #555;
+}
+progress::-webkit-progress-bar {
+    background: #222;
+    border-radius: 4px;
+}
+progress::-webkit-progress-value {
+    background: #00e676; /* Verde */
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+progress[value="0"]::-webkit-progress-value {
+    background: #e57373; /* Vermelho */
+}
+
+.countdown {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffab40; /* Laranja */
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.log-container {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: 'Courier New', Courier, monospace;
+}
+.log-entry {
+    padding-bottom: 5px;
+    border-bottom: 1px solid #333;
+}
+.log-success {
+    color: #81c784;
+}
+.log-error {
+    color: #e57373;
+}
+.log-unauthorized {
+    color: #ffc971; /* Amarelo/Laranja para 401 */
+}
