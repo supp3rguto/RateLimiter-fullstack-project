@@ -136,4 +136,4 @@ spring.datasource.password=SUA_SENHA_ROOT_AQUI
 **Augusto Ortigoso Barbosa**
 
 * **GitHub:** [github.com/supp3rguto](https://github.com/supp3rguto)
-* **LinkedIn:** [linkedin.com/in/augusto-barbosa-769602194](https://www.linkedin.com/in/augusto-barbosa-769602194)
+* **LinkedIn:** [linkedin.com/in/augusto-barbosa-769602194](https://www.linkedin.com/in/augusto-ba
