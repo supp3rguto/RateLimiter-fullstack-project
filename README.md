@@ -1,139 +1,108 @@
-# 🚀 Microsserviço de Rate Limiter com Java, Spring Boot e MySQL
+# 🛡️ Rate Limiter Dinâmico com Spring Boot e AOP
 
-Este projeto é um **microsserviço de backend robusto** que implementa um **controle de taxa (rate limiting)** dinâmico e configurável, demonstrando uma solução de engenharia de software *vertical* e pronta para um ambiente de produção SaaS.
+<p>
+  <img src="https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk&logoColor=white" />
+  <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" />
+  <img src="https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
+  
+</p>
 
-O frontend (em **React**) serve como um **Dashboard de Simulação** interativo para visualizar e testar a lógica do backend em tempo real.
+Este projeto é um **microsserviço de backend robusto** que implementa um **controle de taxa (rate limiting)** dinâmico e configurável, demonstrando uma solução de engenharia de software *vertical* e pronta para um ambiente de produção SaaS. O frontend (em **React**) serve como um **Dashboard de Simulação** interativo para visualizar e testar a lógica do backend em tempo real.
 
-
-## 🎥 Demonstração em Ação
-
-obs: gravar um gif do projeto
-
-
-## 🎯 O Problema de Mercado
+## 🎓 Contexto e Justificativa
 
 Em qualquer arquitetura de **API pública** ou modelo **SaaS (Software as a Service)**, é crucial proteger os endpoints contra abuso, uso excessivo ou ataques de negação de serviço (DoS).
 
 Este projeto resolve dois problemas centrais:
 
-- **Estabilidade:** Impedir que um único usuário faça milhares de requisições e derrube o serviço para todos os outros.  
-- **Modelo de Negócio:** Criar diferentes *planos* (ex: *Free*, *Pro*) com limites de uso distintos para cada cliente.
+  * **Estabilidade e Resiliência:** Impedir que um único usuário faça milhares de requisições e sobrecarregue o serviço para todos os outros clientes.
+  * **Modelo de Negócio (Monetização):** Criar diferentes *planos* (ex: *Free*, *Pro*, *Enterprise*) com limites de uso distintos para cada cliente, permitindo a monetização da API.
+
+## ✨ Funcionalidades e Destaques de Engenharia
+
+O valor deste projeto reside nas **decisões de arquitetura** que o tornam escalável e pronto para ambientes concorrentes.
+
+  * **Regras Dinâmicas (SaaS Ready):** As regras de limite (tokens, tempo de recarga) **não estão hardcoded** — são lidas do banco de dados (MySQL), permitindo que o time de negócios altere planos de clientes sem novo deploy do backend.
+  * **Arquitetura Limpa com AOP:** A lógica de verificação de limite é um *cross-cutting concern* e é tratada de forma **declarativa e desacoplada** usando **Programação Orientada a Aspectos (AOP)**.
+      * Uma anotação customizada (`@RateLimited`) é usada para marcar o `Controller`.
+      * Um `RateLimiterAspect` intercepta e executa a verificação antes de qualquer lógica de negócio.
+  * **Atomicidade e Concorrência:** O método de consumo de tokens é anotado com `@Transactional`, garantindo que a leitura e atualização de tokens sejam **atômicas**. Isso previne *race conditions* em ambientes multi-thread.
+  * **Tratamento de Erros Semântico:** Retornos HTTP padronizados e informativos:
+      * `401 Unauthorized`: Chave `X-API-KEY` ausente ou inválida.
+      * `429 Too Many Requests`: Chave válida, mas limite de tokens excedido.
+
+## 📸 Galeria do Sistema
 
 
 
-## 🛠️ Stack Tecnológica
+## 🚀 Arquitetura e Tecnologias
 
-### Backend
-- Java 21  
-- Spring Boot (Web, Data JPA, AOP)  
-- MySQL  
+A solução é dividida em um microsserviço (backend) responsável pela lógica de rate limiting e um painel de visualização (frontend).
 
-### Frontend (Dashboard)
-- React (Vite)  
-- Axios  
+### ☕ Backend (Java/Spring Boot)
 
-### Build
-- Maven  
+O backend é a fonte da verdade para o estado do Rate Limiter.
 
+  * **Java 21 & Spring Boot:** Plataforma robusta para o microsserviço.
+  * **Spring Data JPA:** Para persistência e transações atômicas com o banco de dados.
+  * **Spring AOP:** Uso fundamental para desacoplar a lógica de segurança (Rate Limiting) da lógica de negócio (Controller).
+  * **MySQL:** Armazenamento centralizado e relacional das regras de Rate Limit e associação de chaves.
 
-## ✨ Destaques de Engenharia (A Complexidade "Oculta")
+### ⚛️ Frontend (React)
 
-O valor deste projeto não está no que o frontend mostra, mas nas **decisões de arquitetura** por trás dele.
+O frontend simula um cliente consumindo a API.
 
+  * **React (Vite):** Dashboard reativo e de alta velocidade para testes.
+  * **Axios:** Para chamadas assíncronas ao backend.
+  * **Hooks de Estado:** Para visualização em tempo real da contagem de tokens após cada requisição.
 
-### 1. Arquitetura Limpa com Programação Orientada a Aspectos (AOP)
-
-A lógica de verificação de limite — um *cross-cutting concern* — **não polui o Controller**.  
-A verificação é feita de forma **declarativa e desacoplada** usando AOP.
-
-- Criada a anotação customizada `@RateLimited(endpointName = "...")`.  
-- O `RateLimiterAspect` intercepta métodos anotados, executando a verificação antes da execução do endpoint.  
-
-**Resultado:**  
-O `ApiController` permanece limpo e focado apenas em suas rotas e dados, enquanto o *Aspecto* cuida da segurança.
-
-
-### 2. Regras Dinâmicas (Pronto para SaaS)
-
-As regras de limite **não estão hardcoded** no código Java — são lidas do **banco de dados**.  
-Isso permite que o time de negócios altere os planos de clientes sem novo deploy do backend.
-
-**Estrutura do banco:**
-- `plans`: Define planos (ex: *Free*, 10 tokens, 60s de recarga).  
-- `api_keys`: Associa uma chave de API a um plano.  
-- `endpoint_costs`: Define quantos tokens uma chamada específica consome (ex: `"create_resource"` custa 5 tokens).
-
-
-### 3. Resiliência e Integridade de Dados
-
-O backend foi projetado para **ambientes concorrentes (multi-thread)**.
-
-- **Atomicidade (ACID):**  
-  O método `RateLimitingService.tryConsumeToken()` é anotado com `@Transactional`.  
-  Isso garante que a leitura e atualização de tokens sejam **atômicas**, evitando *race conditions* (ex: múltiplos requests consumindo o mesmo token).
-
-- **Tratamento de Erros:**  
-  Retornos HTTP padronizados e semânticos:
-  - `401 Unauthorized`: Chave `X-API-KEY` ausente ou inválida.  
-  - `429 Too Many Requests`: Chave válida, mas limite de tokens excedido.
-
-
-## 🚀 Como Executar o Projeto Localmente
+## 💻 Como Executar o Projeto Localmente
 
 ### 🧩 Pré-requisitos
-- Java 21+ (JDK)  
-- MySQL 8.0+  
-- Node.js 18+
 
+  * **Java 21+** (JDK)
+  * **MySQL 8.0+**
+  * **Node.js 18+**
 
-### 🖥️ 1. Backend (Java)
+### 🖥️ 1. Configuração do Backend (Java/MySQL)
 
-1. Clone o repositório.  
-2. Abra o **MySQL Workbench** (ou cliente de sua preferência).  
-3. Execute o script, e criará o banco `ratelimit_db` e populará as tabelas.  :
-   
-```
-RateLimite-backend/sql/setup.sql
-````
+1.  Clone o repositório.
 
-4. Abra o projeto `RateLimite-backend` no IntelliJ (ou IDE preferida).  
-5. Atualize o arquivo `src/main/resources/application.properties` com sua senha do MySQL:
+2.  Abra seu cliente MySQL (Workbench, DBeaver, etc.) e execute o script de setup:
 
-```properties
-spring.datasource.password=SUA_SENHA_ROOT_AQUI
-````
+    ```
+    RateLimite-backend/sql/setup.sql
+    ```
 
-6. Rode a classe `RateLimiteBackendApplication.java`.
-   O servidor iniciará na porta **8080**.
+    > Este script criará o banco `ratelimit_db` e populará as tabelas de `plans`, `api_keys` e `endpoint_costs`.
 
+3.  No projeto `RateLimite-backend`, atualize o arquivo de propriedades com sua senha do banco:
 
-### 💻 2. Frontend (React)
+    ```properties
+    # src/main/resources/application.properties
+    spring.datasource.password=SUA_SENHA_ROOT_AQUI
+    ```
 
-1. Abra um terminal e vá até a pasta:
+4.  Rode a classe `RateLimiteBackendApplication.java` para iniciar o servidor na porta **8080**.
 
-   ```bash
-   cd frontend-react
-   ```
-2. Instale as dependências:
+### 💻 2. Configuração do Frontend (React)
 
-   ```bash
-   npm install
-   ```
-3. Inicie o servidor de desenvolvimento:
-
-   ```bash
-   npm run dev
-   ```
-4. Acesse o projeto em:
-
-   ```
-   http://localhost:5173
-   ```
-
+1.  Abra o terminal e navegue até a pasta:
+    ```bash
+    cd frontend-react
+    ```
+2.  Instale as dependências e inicie:
+    ```bash
+    npm install
+    npm run dev
+    ```
+3.  Acesse o projeto em `http://localhost:5173`.
 
 ## 👨‍💻 Autor
 
 **Augusto Ortigoso Barbosa**
 
-* **GitHub:** [github.com/supp3rguto](https://github.com/supp3rguto)
-* **LinkedIn:** [linkedin.com/in/augusto-barbosa-769602194](https://www.linkedin.com/in/augusto-ba
+  * **GitHub:** [github.com/supp3rguto](https://github.com/supp3rguto)
+  * **LinkedIn:** [linkedin.com/in/augusto-barbosa-769602194](https://www.linkedin.com/in/augusto-barbosa-769602194)
